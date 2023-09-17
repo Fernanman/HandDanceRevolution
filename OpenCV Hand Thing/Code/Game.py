@@ -9,7 +9,7 @@ import random
 clock = pygame.time.Clock()
 pygame.init()
 pygame.font.init()
-pygame.display.set_caption("Plant Gang")
+pygame.display.set_caption("Hand Dance Revolution")
 
 size = pygame.display.get_desktop_sizes()
 WINDOW_SIZE = (1000, 600)
@@ -25,6 +25,8 @@ index = pygame.image.load("Assets\\Index.png").convert_alpha()
 index_middle = pygame.image.load("Assets\\Index-Middle.png").convert_alpha()
 pinky_thumb = pygame.image.load("Assets\\Pinky-Thumb.png").convert_alpha()
 pinky_thumb_index = pygame.image.load("Assets\\Pinky-Thumb-Index.png").convert_alpha()
+
+setup = setup_camera()
 
 
 def song_select():
@@ -60,8 +62,30 @@ def test():
         pygame.display.update()
         clock.tick(60)
 
+def try_again():
+    black = (0, 0, 0)
+    pc_senior = pygame.font.Font("Assets\\pcsenior.ttf", 32)
+    try_agian_surface = pc_senior.render("Press space to try again", False, (255, 255, 255))
+    try_again_rect = try_agian_surface.get_rect(center = (500, 300))
+    
+    while True:
+        display.fill(black)
+        display.blit(try_agian_surface, try_again_rect)
+
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_SPACE:
+                    survival()
+            if event.type == QUIT:
+                pygame.quit()
+                exit()
+
+        screen.blit(pygame.transform.scale(display, WINDOW_SIZE), (0,0))
+        pygame.display.update()
+        clock.tick(60)
+
+
 def survival():
-    setup = setup_camera()
     white = (255, 255, 255)
     thing_map = {0 : "Index",
                  1 : "Index-Middle",
@@ -75,7 +99,8 @@ def survival():
     signs_signals = [index, index_middle, pinky_thumb, pinky_thumb_index]
     start_left = False
     start_right = False
-    
+    seconds = 5
+
     combo = 0
     pc_senior = pygame.font.Font("Assets\\pcsenior.ttf", 32)
 
@@ -92,20 +117,14 @@ def survival():
             else:
                 display.blit(signs_signals[pick_1], left_rect)
                 display.blit(signs_signals[pick_2], right_rect)
-                time_elapsed_left = time_start_left - time_ns()
+                time_elapsed_left = time_ns() - time_start_left 
                 if handsigns != None and (thing_map[pick_1], "Left") in handsigns and \
                 (thing_map[pick_2], "Right") in handsigns:
                     combo += 1
                     start_left = False
                     start_right = False
-                elif time_elapsed_left > 2e+9:
-                    pygame.quit()
-                    exit()
-
-        # elif combo <=20:
-        #     pick_2 = random.randint(0,4)
-        # else:
-        #     pass
+                elif time_elapsed_left > (seconds * 1e+9):
+                    try_again()
 
         combo_surface = pc_senior.render(f"Combo: {combo}", False, (0, 0, 0))
         top_text_rect = combo_surface.get_rect(midleft = (0, 50))
