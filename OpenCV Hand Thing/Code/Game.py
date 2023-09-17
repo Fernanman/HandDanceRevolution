@@ -84,16 +84,20 @@ def survival():
         handsigns = detect_handsign(*setup)
 
         if combo <= 10000:
-            if not start_left:
+            if not start_left and not start_right:
                 time_start_left = time_ns()
                 start_left = True
-                pick_1 = random.randint(0,3)
+                pick_1 = random.randint(0, 3)
+                pick_2 = random.randint(0, 3)
             else:
                 display.blit(signs_signals[pick_1], left_rect)
+                display.blit(signs_signals[pick_2], right_rect)
                 time_elapsed_left = time_start_left - time_ns()
-                if handsigns != None and (thing_map[pick_1], "Left") in handsigns:
+                if handsigns != None and (thing_map[pick_1], "Left") in handsigns and \
+                (thing_map[pick_2], "Right") in handsigns:
                     combo += 1
                     start_left = False
+                    start_right = False
                 elif time_elapsed_left > 2e+9:
                     pygame.quit()
                     exit()
@@ -107,13 +111,8 @@ def survival():
         top_text_rect = combo_surface.get_rect(midleft = (0, 50))
         display.blit(combo_surface, top_text_rect)
 
-        print(clock.get_time())
-
         if handsigns == 'break':
             break
-        elif handsigns != None:
-            for sign in handsigns:
-                print(sign[0], '-', sign[1])
 
         for event in pygame.event.get():
             if event.type == QUIT:
